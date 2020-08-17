@@ -37,12 +37,15 @@ def lsc(tg, t):
 def m4aTags(id, src='./'):
     src = os.path.realpath(src)
     listFiles = listAudio(src) if os.path.isdir(src) else [src]
-    for track in loadAMAblum(id=id):
-        for ls in listFiles:
+    for ls in listFiles:
+        for track in loadAMAblum(id=id):
             # replace youtube vid
             assert_name = re.sub(r'-.{11}$', '', os.path.splitext(os.path.basename(ls))[0])
-            simi = lsc(track['attributes']['name'], assert_name)
+            simi_name = lsc(track['attributes']['name'], assert_name)
+            simi_artist = lsc(track['attributes']['name'] + ' ' + track['attributes']['artistName'], assert_name)
+            simi = max(simi_name, simi_artist)
             if simi > 0.6:
                 print('Name: %s | File: %s | Match: %s' % (track['attributes']['name'], ls, simi))
                 setTags(track['attributes'], ls)
+                break
 

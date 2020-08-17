@@ -1,5 +1,5 @@
 # coding: utf-8
-from ffd.__version__ import __version__
+from amid3.__version__ import __version__
 import setuptools
 
 
