@@ -12,6 +12,7 @@ def __request(url, method='GET', header={}):
 
 def loadAMAblum(id):
     with request.urlopen(__request(f'https://amp-api.music.apple.com/v1/catalog/us/albums/{id}?omit%5Bresource%5D=autos&include=tracks%2Cartists&include%5Bsongs%5D=composers&extend=offers%2Cpopularity&views=appears-on%2Cmore-by-artist%2Crelated-videos%2Cother-versions%2Cyou-might-also-like&fields%5Bartists%5D=name%2Curl&l=en-us')) as res:
+        print('[apple music] Status: %s' % res.status)
         content = json.loads(res.read().decode("UTF-8"))
         return content['data'][0]['relationships']['tracks']['data']
         # for track in content['data'][0]['relationships']['tracks']['data']:

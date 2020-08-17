@@ -4,8 +4,8 @@ import os
 import sys
 import re
 
-def setTags(data, path):
-    audio = mp4.MP4(os.path.realpath(path))
+def setTags(data, path, cpil):
+    audio = mp4.MP4(path)
     audio.tags['\xa9ART'] = data['artistName']
     audio.tags['\xa9alb'] = data['albumName']
     audio.tags['\xa9nam'] = data['name']
@@ -15,8 +15,9 @@ def setTags(data, path):
     audio.tags['trkn'] = [(data['trackNumber'], 0)]
     audio.tags['disk'] = [(data['discNumber'], 0)]
     audio.tags['covr'] = [loadCover(data['artwork'])]
+    audio.tags['cpil'] = cpil
     audio.save()
-    # print(audio.pprint())
+    print('[mutagen] Dest: %s' % path)
 
 def listAudio(inputPath):
     fl = filter(lambda x: os.path.splitext(x)[-1] == '.m4a', os.listdir(inputPath))
@@ -34,18 +35,29 @@ def lsc(tg, t):
                 o[k+1][f+1] = max(o[k][f+1], o[k+1][f])
     return round(o[len(t_ls)][len(tg_ls)] / max(len(t_ls), len(tg_ls)), 2)
 
-def m4aTags(id, src='./'):
+def m4aTags(id, src='./', cpil=False):
     src = os.path.realpath(src)
     listFiles = listAudio(src) if os.path.isdir(src) else [src]
+    tracksAttrs = loadAMAblum(id=id)
     for ls in listFiles:
-        for track in loadAMAblum(id=id):
-            # replace youtube vid
-            assert_name = re.sub(r'-.{11}$', '', os.path.splitext(os.path.basename(ls))[0])
+        # replace youtube vid
+        assert_name = re.sub(r'-.{11}$', '', os.path.splitext(os.path.basename(ls))[0])
+        def simiTracks(track):
             simi_name = lsc(track['attributes']['name'], assert_name)
-            simi_artist = lsc(track['attributes']['name'] + ' ' + track['attributes']['artistName'], assert_name)
-            simi = max(simi_name, simi_artist)
-            if simi > 0.6:
-                print('Name: %s | File: %s | Match: %s' % (track['attributes']['name'], ls, simi))
-                setTags(track['attributes'], ls)
-                break
+            simi_name_artist = lsc(track['attributes']['name'] + ' ' + track['attributes']['artistName'], assert_name)
+            simi_artist_title = lsc(track['attributes']['artistName'] + ' ' + track['attributes']['name'], assert_name)
+            # print(track['attributes']['name'], simi_name, simi_name_artist, simi_artist_title)
+            return max(simi_name, simi_name_artist, simi_artist_title)
+        simi_all_tracks = list(map(simiTracks, tracksAttrs))
+        max_simi = max(simi_all_tracks)
+        max_simi_idx = simi_all_tracks.index(max_simi)
+
+        print('[matching] Title: %s | Assert: %s | Match: %s' % (
+            tracksAttrs[max_simi_idx]['attributes']['name'],
+            assert_name,
+            max_simi))
+        if max_simi > 0.6:
+            setTags(tracksAttrs[max_simi_idx]['attributes'], ls, cpil)
+        else:
+            print('[matching] Cannot match')
 
