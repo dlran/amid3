@@ -11,7 +11,7 @@ def setTags(data, path, cpil):
     audio.tags['\xa9nam'] = data['name']
     audio.tags['\xa9day'] = data['releaseDate']
     audio.tags['\xa9gen'] = data['genreNames']
-    audio.tags['\xa9wrt'] = data['composerName']
+    audio.tags['\xa9wrt'] = data.get('composerName', '')
     audio.tags['trkn'] = [(data['trackNumber'], 0)]
     audio.tags['disk'] = [(data['discNumber'], 0)]
     audio.tags['covr'] = [loadCover(data['artwork'])]
@@ -35,7 +35,7 @@ def lsc(tg, t):
                 o[k+1][f+1] = max(o[k][f+1], o[k+1][f])
     return round(o[len(t_ls)][len(tg_ls)] / max(len(t_ls), len(tg_ls)), 2)
 
-def m4aTags(id, src='./', cpil=False):
+def m4aTags(id, src='./', cpil=False, simi=None):
     src = os.path.realpath(src)
     listFiles = listAudio(src) if os.path.isdir(src) else [src]
     tracksAttrs = loadAMAblum(id=id)
@@ -56,7 +56,7 @@ def m4aTags(id, src='./', cpil=False):
             tracksAttrs[max_simi_idx]['attributes']['name'],
             assert_name,
             max_simi))
-        if max_simi > 0.6:
+        if max_simi > (simi or 0.6):
             setTags(tracksAttrs[max_simi_idx]['attributes'], ls, cpil)
         else:
             print('[matching] Cannot match')
