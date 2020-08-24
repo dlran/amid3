@@ -1,26 +1,69 @@
 from urllib import request
 import json
+import re
+import time
 
 def __request(url, method='GET', header={}):
     return request.Request(
         url = url,
         headers = {
             'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36',
-            'authorization': 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IldlYlBsYXlLaWQifQ.eyJpc3MiOiJBTVBXZWJQbGF5IiwiaWF0IjoxNTk2NzQ4MjU1LCJleHAiOjE2MTIzMDAyNTV9.0RaBH15qTCKAhV3toQzZfxjNkYg6cqNagNUPQMkpUE3Ox6O-EV-3G42hOJprkv-b8tLBUG6lxa94W7BORdYluw',
             **header},
         method = method)
 
-def loadAMAblum(id):
-    with request.urlopen(__request(f'https://amp-api.music.apple.com/v1/catalog/us/albums/{id}?omit%5Bresource%5D=autos&include=tracks%2Cartists&include%5Bsongs%5D=composers&extend=offers%2Cpopularity&views=appears-on%2Cmore-by-artist%2Crelated-videos%2Cother-versions%2Cyou-might-also-like&fields%5Bartists%5D=name%2Curl&l=en-us')) as res:
+def appleMusic(url):
+    try:
+        int(url)
+    except ValueError:
+        url = re.sub(r'\/$', '', url).rsplit('/', 1)[-1]
+    ampApi = f'https://amp-api.music.apple.com/v1/catalog/us/albums/{url}?omit%5Bresource%5D=autos&include=tracks%2Cartists&include%5Bsongs%5D=composers&extend=offers%2Cpopularity&views=appears-on%2Cmore-by-artist%2Crelated-videos%2Cother-versions%2Cyou-might-also-like&fields%5Bartists%5D=name%2Curl&l=en-us'
+
+    with request.urlopen(__request(
+            url=ampApi,
+            header={'authorization': 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IldlYlBsYXlLaWQifQ.eyJpc3MiOiJBTVBXZWJQbGF5IiwiaWF0IjoxNTk2NzQ4MjU1LCJleHAiOjE2MTIzMDAyNTV9.0RaBH15qTCKAhV3toQzZfxjNkYg6cqNagNUPQMkpUE3Ox6O-EV-3G42hOJprkv-b8tLBUG6lxa94W7BORdYluw'}
+            )) as res:
         print('[apple music] Status: %s' % res.status)
-        content = json.loads(res.read().decode("UTF-8"))
-        return content['data'][0]['relationships']['tracks']['data']
-        # for track in content['data'][0]['relationships']['tracks']['data']:
-        #     print(track['attributes']['name'])
-        #     print(track['attributes']['albumName'])
-        #     print(track['attributes']['artistName'])
+        content = json.loads(res.read().decode("UTF-8"))['data'][0]
+        tracks = content['relationships']['tracks']['data']
+        for t in tracks:
+            t['attributes']['copyright'] = content['attributes']['copyright']
+            t['attributes']['description'] = content['id']
+        return tracks
 
 def loadCover(artwork):
     url = artwork['url'].format(w='1000', h='1000')
     with request.urlopen(__request(url)) as res:
         return res.read()
+
+def iHeartRadio(url):
+    with request.urlopen(__request(url)) as res:
+        print('[iHeartRadio] Status: %s' % res.status)
+        content = re.findall(
+            r'<script data-name="initial-state" id="initialState" type="application/json">(.+?)</script>',
+            res.read().decode('utf-8'))
+        if content:
+            content = content[0]
+        else:
+            print('[iHeartRadio] Error: script json data not found')
+        albums = json.loads(content)['albums']['albums']
+        albums = albums[list(albums.keys())[0]]
+        def mapTracks(track):
+            return {
+              'attributes': {
+                'albumName': albums['title'],
+                'artistName': track['artistName'],
+                'name': track['title'],
+                'releaseDate': time.strftime('%Y-%m-%d %H%M%S', time.localtime(albums['releaseDate'] / 1000)),
+                'genreNames': '', # ['Pop']
+                'composerName': '',
+                'trackNumber': track['trackNumber'],
+                'discNumber': track['volume'],
+                'artwork': {'url': albums['image']},
+                'contentRating': 'explicit' if track['explicitLyrics'] else '',
+                'copyright': albums['copyright'],
+                'description': url
+              }
+            }
+        return map(mapTracks, albums['tracks'])
+
+

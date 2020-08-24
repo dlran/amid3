@@ -1,5 +1,5 @@
 from mutagen import File, mp4
-from .am import loadAMAblum, loadCover
+from .am import appleMusic, loadCover, iHeartRadio
 import os
 import sys
 import re
@@ -16,6 +16,15 @@ def setTags(data, path, cpil):
     audio.tags['disk'] = [(data['discNumber'], 0)]
     audio.tags['covr'] = [loadCover(data['artwork'])]
     audio.tags['cpil'] = cpil
+
+    audio.tags['cprt'] = data.get('copyright', '')
+    audio.tags['desc'] = data.get('description', '')
+
+    if data.get('contentRating') == 'explicit':
+        audio.tags['rtng'] = [4]
+    elif data.get('contentRating') == 'clean':
+        audio.tags['rtng'] = [2]
+
     audio.save()
     print('[mutagen] Dest: %s' % path)
 
@@ -35,10 +44,13 @@ def lsc(tg, t):
                 o[k+1][f+1] = max(o[k][f+1], o[k+1][f])
     return round(o[len(t_ls)][len(tg_ls)] / max(len(t_ls), len(tg_ls)), 2)
 
-def m4aTags(id, src='./', cpil=False, simi=None):
+def m4aTags(url, src='./', cpil=False, simi=None):
     src = os.path.realpath(src)
     listFiles = listAudio(src) if os.path.isdir(src) else [src]
-    tracksAttrs = loadAMAblum(id=id)
+    if 'iheart.com' in url:
+        tracksAttrs = list(iHeartRadio(url=url))
+    else:
+        tracksAttrs = appleMusic(url=url)
     for ls in listFiles:
         # replace youtube vid
         assert_name = re.sub(r'-.{11}$', '', os.path.splitext(os.path.basename(ls))[0])
