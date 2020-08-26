@@ -18,7 +18,12 @@ def setTags(data, path, cpil):
     audio.tags['cpil'] = cpil
 
     audio.tags['cprt'] = data.get('copyright', '')
-    audio.tags['desc'] = data.get('description', '')
+    yt_vid = re.findall(r'-.{11}$', os.path.splitext(os.path.basename(path))[0])
+    if data.get('description') and yt_vid:
+        keep_id = data['description'] + yt_vid[0]
+    else:
+        keep_id = data.get('description', '')
+    audio.tags['desc'] = keep_id
 
     if data.get('contentRating') == 'explicit':
         audio.tags['rtng'] = [4]
