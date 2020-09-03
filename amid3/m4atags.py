@@ -49,13 +49,13 @@ def lsc(tg, t):
                 o[k+1][f+1] = max(o[k][f+1], o[k+1][f])
     return round(o[len(t_ls)][len(tg_ls)] / max(len(t_ls), len(tg_ls)), 2)
 
-def m4aTags(url, src='./', cpil=False, simi=None):
+def m4aTags(url, src='./', cpil=False, simi=None, region='us'):
     src = os.path.realpath(src)
     listFiles = listAudio(src) if os.path.isdir(src) else [src]
     if 'iheart.com' in url:
         tracksAttrs = list(iHeartRadio(url=url))
     else:
-        tracksAttrs = appleMusic(url=url)
+        tracksAttrs = appleMusic(url, region)
     for ls in listFiles:
         # replace youtube vid
         assert_name = re.sub(r'-.{11}$', '', os.path.splitext(os.path.basename(ls))[0])

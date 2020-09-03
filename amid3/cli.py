@@ -10,6 +10,7 @@ def main():
     parser.add_argument('-s', '--src', type=str, help='source directory or single file, default ./', default='./')
     parser.add_argument('-c', '--cpil', action='store_true', help="album is a compilation of songs by various artists")
     parser.add_argument('--simi', type=float, help="value 0-1 similarity of matching file name, default 0.6")
+    parser.add_argument('--region', choices=['us', 'cn'], type=str, help="apple music country or region")
     parser.add_argument('-v', '--version', action='version', version=__version__)
     argv = sys.argv
     args = parser.parse_args()
@@ -17,7 +18,7 @@ def main():
         parser.print_help(sys.stderr)
         sys.exit(1)
 
-    m4aTags(url=args.url, src=args.src, cpil=args.cpil, simi=args.simi)
+    m4aTags(url=args.url, src=args.src, cpil=args.cpil, simi=args.simi, region=args.region)
 
 
 if __name__ == '__main__':
