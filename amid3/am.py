@@ -21,7 +21,7 @@ def appleMusic(url, region='us'):
 
     with request.urlopen(__request(
             url=ampApi,
-            header={'authorization': 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IldlYlBsYXlLaWQifQ.eyJpc3MiOiJBTVBXZWJQbGF5IiwiaWF0IjoxNTk2NzQ4MjU1LCJleHAiOjE2MTIzMDAyNTV9.0RaBH15qTCKAhV3toQzZfxjNkYg6cqNagNUPQMkpUE3Ox6O-EV-3G42hOJprkv-b8tLBUG6lxa94W7BORdYluw'}
+            header={'authorization': 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IldlYlBsYXlLaWQifQ.eyJpc3MiOiJBTVBXZWJQbGF5IiwiaWF0IjoxNjExNzk2MDYwLCJleHAiOjE2MjczNDgwNjB9.4_Cx1u-0LVGqnSS71Jd7DCFSD5NT2LIPI1pU1BvLRVxCaP5NT5FZQHcOLS_wMdXPNBxm8QAQnXY22Uub2uVulg'}
             )) as res:
         print('[apple music] Status: %s' % res.status)
         content = json.loads(res.read().decode("UTF-8"))['data'][0]
