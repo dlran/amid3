@@ -16,7 +16,7 @@ def appleMusic(url, region='us'):
         int(url)
     except ValueError:
         url = re.sub(r'\/$', '', url).rsplit('/', 1)[-1]
-    regions = {'us': 'en-us', 'cn': 'zh-cn', 'hk': 'zh-hk'}
+    regions = {'us': 'en-us', 'cn': 'zh-cn', 'hk': 'zh-hk', 'ca': 'en-ca'}
     ampApi = f'https://amp-api.music.apple.com/v1/catalog/{region}/albums/{url}?omit%5Bresource%5D=autos&include=tracks%2Cartists&include%5Bsongs%5D=composers&extend=offers%2Cpopularity&views=appears-on%2Cmore-by-artist%2Crelated-videos%2Cother-versions%2Cyou-might-also-like&fields%5Bartists%5D=name%2Curl&l={regions[region]}'
 
     with request.urlopen(__request(

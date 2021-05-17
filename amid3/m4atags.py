@@ -37,7 +37,7 @@ def listAudio(inputPath):
     fl = filter(lambda x: os.path.splitext(x)[-1] == '.m4a', os.listdir(inputPath))
     return [os.path.join(inputPath, f) for f in fl]
 
-def lsc(tg, t):
+def lcs(tg, t):
     tg_ls = list(tg)
     t_ls = list(t)
     o = list(map(lambda x: [0] * (len(tg_ls) + 1), [[], *t_ls]))
@@ -60,9 +60,9 @@ def m4aTags(url, src='./', cpil=False, simi=None, region='us'):
         # replace youtube vid
         assert_name = re.sub(r'-.{11}$', '', os.path.splitext(os.path.basename(ls))[0])
         def simiTracks(track):
-            simi_name = lsc(track['attributes']['name'], assert_name)
-            simi_name_artist = lsc(track['attributes']['name'] + ' ' + track['attributes']['artistName'], assert_name)
-            simi_artist_title = lsc(track['attributes']['artistName'] + ' ' + track['attributes']['name'], assert_name)
+            simi_name = lcs(track['attributes']['name'], assert_name)
+            simi_name_artist = lcs(track['attributes']['name'] + ' ' + track['attributes']['artistName'], assert_name)
+            simi_artist_title = lcs(track['attributes']['artistName'] + ' ' + track['attributes']['name'], assert_name)
             # print(track['attributes']['name'], simi_name, simi_name_artist, simi_artist_title)
             return max(simi_name, simi_name_artist, simi_artist_title)
         simi_all_tracks = list(map(simiTracks, tracksAttrs))
