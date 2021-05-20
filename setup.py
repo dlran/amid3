@@ -7,7 +7,7 @@ setuptools.setup(
   name='amid3',
   version=__version__,
   author='dlr',
-  author_email='dlr@yy.com',
+  author_email='dlr@rld.com',
   description=u'm4a ID3 editor',
   packages=setuptools.find_packages(),
   url='https://dlran.github.io',
@@ -16,6 +16,7 @@ setuptools.setup(
       'amid3=amid3.cli:main'
     ]
   },
+  install_requires=['mutagen'],
   classifiers=[
       'Programming Language :: Python :: 3 :: Only'
   ]

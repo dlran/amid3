@@ -5,7 +5,7 @@ from .__init__ import m4aTags
 from .__version__ import __version__
 
 def main():
-    parser = argparse.ArgumentParser(description = '666', usage="amid3 [options...] [args] AlbumId")
+    parser = argparse.ArgumentParser(description = 'Get Apple Music album data and adds iTunes compatible tags on m4a files.', usage="amid3 [options...] [args] AlbumId")
     parser.add_argument('url', type=str, help='apple music album url or id')
     parser.add_argument('-s', '--src', type=str, help='source directory or single file, default ./', default='./')
     parser.add_argument('-c', '--cpil', action='store_true', help="album is a compilation of songs by various artists")
