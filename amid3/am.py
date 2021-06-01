@@ -27,7 +27,7 @@ def appleMusic(url, region='us'):
         content = json.loads(res.read().decode("UTF-8"))['data'][0]
         tracks = content['relationships']['tracks']['data']
         for t in tracks:
-            t['attributes']['copyright'] = content['attributes']['copyright']
+            t['attributes']['copyright'] = content['attributes'].get('copyright') or content['attributes']['recordLabel']
             t['attributes']['description'] = content['id']
         return tracks
 
