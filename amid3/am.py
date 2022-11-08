@@ -16,23 +16,28 @@ def appleMusic(url, region='us'):
         int(url)
     except ValueError:
         url = re.sub(r'\/$', '', url).rsplit('/', 1)[-1]
-    regions = {'us': 'en-us', 'cn': 'zh-cn', 'hk': 'zh-hk', 'ca': 'en-ca', 'jp': 'ja'}
-    ampApi = f'https://amp-api.music.apple.com/v1/catalog/{region}/albums/{url}?omit%5Bresource%5D=autos&include=tracks%2Cartists&include%5Bsongs%5D=composers&extend=offers%2Cpopularity&views=appears-on%2Cmore-by-artist%2Crelated-videos%2Cother-versions%2Cyou-might-also-like&fields%5Bartists%5D=name%2Curl&l={regions[region]}'
+    regions = {'us': 'en-US', 'cn': 'zh-cn', 'hk': 'zh-hk', 'ca': 'en-ca', 'jp': 'ja'}
+    ampApi = f'https://amp-api.music.apple.com/v1/catalog/{region}/albums/{url}?art%5Burl%5D=f&extend=editorialArtwork%2CeditorialVideo%2CextendedAssetUrls%2Coffers&fields%5Bartists%5D=name%2Curl&fields%5Bcurators%5D=name&fields%5Brecord-labels%5D=name%2Curl&format%5Bresources%5D=map&include=record-labels%2Cartists&include%5Bmusic-videos%5D=artists&include%5Bplaylists%5D=curator&include%5Bsongs%5D=artists%2Ccomposers%2Calbums&l={regions[region]}&meta%5Balbums%3Atracks%5D=popularity&platform=web&views=appears-on%2Caudio-extras%2Cmore-by-artist%2Cother-versions%2Crelated-videos%2Cvideo-extras%2Cyou-might-also-like'
 
     with request.urlopen(__request(
             url=ampApi,
-            header={'authorization': 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IldlYlBsYXlLaWQifQ.eyJpc3MiOiJBTVBXZWJQbGF5IiwiaWF0IjoxNjI2OTg0ODk4LCJleHAiOjE2NDI1MzY4OTh9.Ftw-IRCBuL9EWw7N8yqsnvsmZc5DI_aqG7ic0eZXOfZMAB7lrVij7HGihIo6Jf9C3ZHw5RfZsd2ZDdYn_ncD9A'}
+            header={
+                'authority': 'amp-api.music.apple.com',
+                'origin': 'https://music.apple.com',
+                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',
+                'authorization': 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IldlYlBsYXlLaWQifQ.eyJpc3MiOiJBTVBXZWJQbGF5IiwiaWF0IjoxNjY2ODk5NDgyLCJleHAiOjE2NzQxNTcwODIsInJvb3RfaHR0cHNfb3JpZ2luIjpbImFwcGxlLmNvbSJdfQ.MZfZRY2CDm-F9I0wuwpVOadfDqvtD0hJe4Rk0Rae9f8IMjVEgnAEVBheJLkg5KZ-DjRWJyrLy7vjM23QDJInqg'}
             )) as res:
         print('[apple music] Status: %s' % res.status)
-        content = json.loads(res.read().decode("UTF-8"))['data'][0]
-        tracks = content['relationships']['tracks']['data']
+        content = json.loads(res.read().decode("UTF-8"))['resources']
+        tracks = content['songs']
+        albums = content['albums'][url]
         for t in tracks:
-            t['attributes']['copyright'] = content['attributes'].get('copyright') or content['attributes']['recordLabel']
-            t['attributes']['description'] = content['id']
-        return tracks
+            tracks[t]['attributes']['copyright'] = albums['attributes'].get('copyright') or albums['attributes']['recordLabel']
+            tracks[t]['attributes']['description'] = albums['id']
+        return list(tracks.values())
 
 def loadCover(artwork):
-    url = artwork['url'].format(w='1000', h='1000')
+    url = artwork['url'].format(w='1000', h='1000', f='jpg')
     with request.urlopen(__request(url)) as res:
         return res.read()
 
