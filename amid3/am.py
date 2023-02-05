@@ -25,7 +25,7 @@ def appleMusic(url, region='us'):
                 'authority': 'amp-api.music.apple.com',
                 'origin': 'https://music.apple.com',
                 'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',
-                'authorization': 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IldlYlBsYXlLaWQifQ.eyJpc3MiOiJBTVBXZWJQbGF5IiwiaWF0IjoxNjY2ODk5NDgyLCJleHAiOjE2NzQxNTcwODIsInJvb3RfaHR0cHNfb3JpZ2luIjpbImFwcGxlLmNvbSJdfQ.MZfZRY2CDm-F9I0wuwpVOadfDqvtD0hJe4Rk0Rae9f8IMjVEgnAEVBheJLkg5KZ-DjRWJyrLy7vjM23QDJInqg'}
+                'authorization': 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IldlYlBsYXlLaWQifQ.eyJpc3MiOiJBTVBXZWJQbGF5IiwiaWF0IjoxNjc1MjAxMDY0LCJleHAiOjE2ODI0NTg2NjQsInJvb3RfaHR0cHNfb3JpZ2luIjpbImFwcGxlLmNvbSJdfQ.X6_jxCKuAndOhOL-hWPMPqwMiNJ6dWCau-FTP8AuXeHYCJLPueZDNSus_cdvqkKWPKyUD5FeTJwxwfvxezY0ow'}
             )) as res:
         print('[apple music] Status: %s' % res.status)
         content = json.loads(res.read().decode("UTF-8"))['resources']
