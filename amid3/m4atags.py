@@ -56,6 +56,7 @@ def m4aTags(url, src='./', cpil=False, simi=None, region='us'):
         tracksAttrs = list(iHeartRadio(url=url))
     else:
         tracksAttrs = appleMusic(url, region)
+    result = []
     for ls in listFiles:
         # replace youtube vid
         assert_name = re.sub(r'-.{11}$', '', os.path.splitext(os.path.basename(ls))[0])
@@ -75,8 +76,10 @@ def m4aTags(url, src='./', cpil=False, simi=None, region='us'):
             max_simi))
         if max_simi > (simi or 0.6):
             setTags(tracksAttrs[max_simi_idx]['attributes'], ls, cpil)
+            result.append(ls)
         else:
             print('[matching] Cannot match')
 
         print('')
+    return result
 
