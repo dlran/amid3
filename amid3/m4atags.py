@@ -3,6 +3,12 @@ from .am import appleMusic, loadCover, iHeartRadio
 import os
 import sys
 import re
+import logging
+
+
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.StreamHandler())
+logger.setLevel(logging.DEBUG)
 
 def setTags(data, path, cpil):
     audio = mp4.MP4(path)
@@ -31,7 +37,7 @@ def setTags(data, path, cpil):
         audio.tags['rtng'] = [2]
 
     audio.save()
-    print('[mutagen] Dest: %s' % path)
+    logger.info('[mutagen] Dest: %s' % path)
 
 def listAudio(inputPath):
     fl = filter(lambda x: os.path.splitext(x)[-1] == '.m4a', os.listdir(inputPath))
@@ -49,7 +55,10 @@ def lcs(tg, t):
                 o[k+1][f+1] = max(o[k][f+1], o[k+1][f])
     return round(o[len(t_ls)][len(tg_ls)] / max(len(t_ls), len(tg_ls)), 2)
 
-def m4aTags(url, src='./', cpil=False, simi=None, region='us'):
+def m4aTags(url, src='./', cpil=False, simi=None, region='us', logger_name=''):
+    if logger_name:
+        global logger
+        logger = logging.getLogger(logger_name)
     src = os.path.realpath(src)
     listFiles = listAudio(src) if os.path.isdir(src) else [src]
     if 'iheart.com' in url:
@@ -64,13 +73,13 @@ def m4aTags(url, src='./', cpil=False, simi=None, region='us'):
             simi_name = lcs(track['attributes']['name'], assert_name)
             simi_name_artist = lcs(track['attributes']['name'] + ' ' + track['attributes']['artistName'], assert_name)
             simi_artist_title = lcs(track['attributes']['artistName'] + ' ' + track['attributes']['name'], assert_name)
-            # print(track['attributes']['name'], simi_name, simi_name_artist, simi_artist_title)
+            # logger.info(track['attributes']['name'], simi_name, simi_name_artist, simi_artist_title)
             return max(simi_name, simi_name_artist, simi_artist_title)
         simi_all_tracks = list(map(simiTracks, tracksAttrs))
         max_simi = max(simi_all_tracks)
         max_simi_idx = simi_all_tracks.index(max_simi)
 
-        print('[matching] Title: %s | Assert: %s | Match: %s' % (
+        logger.info('[matching] Title: %s | Assert: %s | Match: %s' % (
             tracksAttrs[max_simi_idx]['attributes']['name'],
             assert_name,
             max_simi))
@@ -78,8 +87,8 @@ def m4aTags(url, src='./', cpil=False, simi=None, region='us'):
             setTags(tracksAttrs[max_simi_idx]['attributes'], ls, cpil)
             result.append(ls)
         else:
-            print('[matching] Cannot match')
+            logger.info('[matching] Cannot match')
 
-        print('')
+        logger.info('')
     return result
 
