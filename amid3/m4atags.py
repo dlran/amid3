@@ -44,8 +44,8 @@ def listAudio(inputPath):
     return [os.path.join(inputPath, f) for f in fl]
 
 def lcs(tg, t):
-    tg_ls = list(tg)
-    t_ls = list(t)
+    tg_ls = list(tg.lower())
+    t_ls = list(t.lower())
     o = list(map(lambda x: [0] * (len(tg_ls) + 1), [[], *t_ls]))
     for k, v in enumerate(t_ls):
         for f, c in enumerate(tg_ls):
