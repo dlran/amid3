@@ -2,6 +2,7 @@ from urllib import request
 import json
 import re
 import time
+from urllib.parse import quote
 
 def __request(url, method='GET', header={}):
     return request.Request(
@@ -72,4 +73,23 @@ def iHeartRadio(url):
             }
         return map(mapTracks, albums['tracks'])
 
+def appleMusicSearch(text=''):
+    text = quote(text, safe='')
+    ampApi = f'https://amp-api.music.apple.com/v1/catalog/us/search?art%5Bmusic-videos%3Aurl%5D=c&art%5Burl%5D=f&extend=artistUrl&fields%5Balbums%5D=artistName%2CartistUrl%2Cartwork%2CcontentRating%2CeditorialArtwork%2CeditorialNotes%2Cname%2CplayParams%2CreleaseDate%2Curl%2CtrackCount&fields%5Bartists%5D=url%2Cname%2Cartwork&format%5Bresources%5D=map&include%5Balbums%5D=artists&include%5Bmusic-videos%5D=artists&include%5Bsongs%5D=artists&include%5Bstations%5D=radio-show&l=en-US&limit=21&omit%5Bresource%5D=autos&platform=web&relate%5Balbums%5D=artists&relate%5Bsongs%5D=albums&term={text}&types=activities%2Calbums%2Capple-curators%2Cartists%2Ccurators%2Ceditorial-items%2Cmusic-movies%2Cmusic-videos%2Cplaylists%2Crecord-labels%2Csongs%2Cstations%2Ctv-episodes%2Cuploaded-videos&with=lyricHighlights%2Clyrics%2CserverBubbles'
 
+    with request.urlopen(__request(
+            url=ampApi,
+            header={
+                'authority': 'amp-api.music.apple.com',
+                'origin': 'https://music.apple.com',
+                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',
+                'authorization': 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IldlYlBsYXlLaWQifQ.eyJpc3MiOiJBTVBXZWJQbGF5IiwiaWF0IjoxNjc1MjAxMDY0LCJleHAiOjE2ODI0NTg2NjQsInJvb3RfaHR0cHNfb3JpZ2luIjpbImFwcGxlLmNvbSJdfQ.X6_jxCKuAndOhOL-hWPMPqwMiNJ6dWCau-FTP8AuXeHYCJLPueZDNSus_cdvqkKWPKyUD5FeTJwxwfvxezY0ow'}
+            )) as res:
+        print('[apple music] Status: %s' % res.status)
+        _r = json.loads(res.read().decode("UTF-8"))
+        # results = _r['results']
+        # resources = _r['resources']
+        return _r
+
+if __name__ == '__main__':
+    appleMusicSearch(text="Kendrick Lamar N95")
