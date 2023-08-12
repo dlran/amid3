@@ -1,9 +1,12 @@
-from mutagen import File, mp4
 from .am import appleMusic, loadCover, iHeartRadio
 import os
 import sys
 import re
 import logging
+try:
+    from mutagen import File, mp4
+except ImportError:
+    print("mutagen module not found, but continuing...")
 
 
 logger = logging.getLogger(__name__)
