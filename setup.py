@@ -16,7 +16,7 @@ setuptools.setup(
       'amid3=amid3.cli:main'
     ]
   },
-  install_requires=['mutagen'],
+  install_requires=['mutagen>=1.45.1'],
   classifiers=[
       'Programming Language :: Python :: 3 :: Only'
   ]
